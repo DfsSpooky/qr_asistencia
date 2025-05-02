@@ -24,6 +24,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_protect
+import os
 
 def index(request):
     if not request.user.is_authenticated:
@@ -360,3 +361,13 @@ def descargar_reporte_evento_pdf(request, evento_id):
         'can_scan_qr': request.user.has_perm('asistencia.can_scan_qr')
     }
     return response
+def create_superuser(request):
+    username = os.getenv('SUPERUSER_USERNAME', 'admin')
+    email = os.getenv('SUPERUSER_EMAIL', 'admin@example.com')
+    password = os.getenv('SUPERUSER_PASSWORD', ',123456%')
+
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_superuser(username=username, email=email, password=password)
+        return HttpResponse(f"Superuser '{username}' creado exitosamente.")
+    else:
+        return HttpResponse(f"El superuser '{username}' ya existe.")

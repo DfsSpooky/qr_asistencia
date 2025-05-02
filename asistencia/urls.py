@@ -3,7 +3,7 @@ from .views import (
     index, lista_usuarios, detalle_usuario, RegistrarAsistencia,
     escanear_qr, historial_asistencias, descargar_reporte_pdf,
     importar_usuarios, perfil_usuario, descargar_reporte_evento_pdf,
-    registrar_usuario, confirmar_asistencia
+    registrar_usuario, confirmar_asistencia, create_superuser  # Agrega create_superuser aquí
 )
 
 urlpatterns = [
@@ -19,4 +19,5 @@ urlpatterns = [
     path('descargar-reporte-evento/<int:evento_id>/', descargar_reporte_evento_pdf, name='descargar_reporte_evento_pdf'),
     path('registrar-usuario/', registrar_usuario, name='registrar_usuario'),
     path('confirmar-asistencia/<int:asistencia_id>/', confirmar_asistencia, name='confirmar_asistencia'),
+    path('create-superuser/', create_superuser, name='create_superuser'),  # Ahora puedes usar create_superuser directamente
 ]
