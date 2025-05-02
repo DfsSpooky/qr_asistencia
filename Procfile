@@ -1,1 +1,1 @@
-web: gunicorn qr_asistencia.wsgi
+web: python create_superuser.py && gunicorn qr_asistencia.wsgi
