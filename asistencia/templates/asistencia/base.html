@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Asistencia por QR{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #ffd700 !important;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-top: 20px;
+            margin-bottom: 80px;
+        }
+        .breadcrumb {
+            background: none;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        .breadcrumb-item a {
+            color: #2a5298;
+            text-decoration: none;
+        }
+        .breadcrumb-item a:hover {
+            color: #1e3c72;
+            text-decoration: underline;
+        }
+        .footer {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #2a5298;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #1e3c72;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'lista_usuarios' %}">Sistema de Asistencia</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            {% if can_scan_qr %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'escanear_qr' %}">Escanear QR</a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'historial_asistencias' %}">Historial</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'perfil_usuario' %}">Mi Perfil</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'registrar_usuario' %}">Registrar Usuario</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'importar_usuarios' %}">Importar Usuarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'perfil_usuario' %}">Mi Perfil</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}?csrfmiddlewaretoken={% csrf_token %}">Cerrar Sesión</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                {% if user.is_staff %}
+                <li class="breadcrumb-item"><a href="{% url 'lista_usuarios' %}">Inicio</a></li>
+                {% else %}
+                <li class="breadcrumb-item"><a href="{% url 'perfil_usuario' %}">Inicio</a></li>
+                {% endif %}
+                {% block breadcrumb %}
+                {% endblock %}
+            </ol>
+        </nav>
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer class="footer">
+        <p>Sistema de Asistencia por QR - Desarrollado por Bi SOLUTIONS © 2025</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

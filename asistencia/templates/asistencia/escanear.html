@@ -1,0 +1,189 @@
+{% extends 'asistencia/base.html' %}
+{% block title %}Escanear QR{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Escanear QR</li>
+{% endblock %}
+{% block content %}
+<h2 class="mb-4 text-center">Escanear Código QR</h2>
+<button type="button" class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#tutorialModal">Ayuda</button>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <select id="evento" class="form-select mb-3" required>
+            <option value="">Seleccione un evento</option>
+            {% for evento in eventos %}
+            <option value="{{ evento.id }}">{{ evento.nombre }} ({{ evento.fecha }})</option>
+            {% endfor %}
+        </select>
+        <div id="event-info" class="event-info text-primary text-center"></div>
+        <select id="ubicacion" class="form-select mb-3">
+            <option value="">Seleccione una ubicación (opcional)</option>
+            {% for ubicacion in ubicaciones %}
+            <option value="{{ ubicacion.id }}">{{ ubicacion.nombre }}</option>
+            {% endfor %}
+        </select>
+        <div class="d-flex justify-content-center mb-3">
+            <div id="spinner" class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Procesando...</span>
+            </div>
+        </div>
+        <video id="video" width="100%" autoplay style="border: 1px solid black; border-radius: 10px;"></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+</div>
+
+<div class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tutorialModalLabel">Cómo Escanear un Código QR</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>1. Selecciona un evento activo en el menú desplegable.</p>
+                <p>2. Opcionalmente, selecciona una ubicación.</p>
+                <p>3. Apunta la cámara hacia el código QR del usuario.</p>
+                <p>4. Asegúrate de que el código QR esté bien iluminado y dentro del marco.</p>
+                <p>5. Espera la notificación de éxito o error.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const ubicacionSelect = document.getElementById('ubicacion');
+    const eventoSelect = document.getElementById('evento');
+    const eventInfo = document.getElementById('event-info');
+    const spinner = document.getElementById('spinner');
+    let lastScannedDni = null;
+    let isProcessing = false;
+    let lastScanTime = 0;
+    const debounceTime = 5000;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    eventoSelect.addEventListener('change', function() {
+        const selectedOption = eventoSelect.options[eventoSelect.selectedIndex];
+        eventInfo.textContent = selectedOption.value ? `Evento seleccionado: ${selectedOption.text}` : '';
+    });
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play();
+            tick();
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo acceder a la cámara: ' + err,
+            });
+        });
+
+    function tick() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA && !isProcessing) {
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            const currentTime = Date.now();
+            
+            if (code && (code.data !== lastScannedDni || (currentTime - lastScanTime) > debounceTime)) {
+                registrarAsistencia(code.data);
+                lastScannedDni = code.data;
+                lastScanTime = currentTime;
+            }
+        }
+        requestAnimationFrame(tick);
+    }
+
+    async function registrarAsistencia(dni) {
+        const ubicacion_id = ubicacionSelect.value;
+        const evento_id = eventoSelect.value;
+        if (!evento_id) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, selecciona un evento.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
+        isProcessing = true;
+        spinner.style.display = 'block';
+        Swal.close();
+        const data = {
+            dni: dni,
+            ubicacion_id: ubicacion_id,
+            evento_id: evento_id
+        };
+        console.log('Enviando datos:', data);
+        try {
+            const response = await fetch('/api/registrar-asistencia/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                credentials: 'include',
+                body: JSON.stringify(data),
+            });
+            console.log('Respuesta:', response);
+            const dataResponse = await response.json();
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: dataResponse.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: dataResponse.error || 'Error al registrar asistencia.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (error) {
+            console.log('Error en fetch:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al registrar asistencia: ' + error.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } finally {
+            isProcessing = false;
+            spinner.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

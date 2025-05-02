@@ -1,0 +1,75 @@
+{% load tz %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reporte de Asistencia - {{ evento.nombre }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2, h3 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .summary { margin-bottom: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Reporte de Asistencia</h1>
+    <h2>Evento: {{ evento.nombre }} ({{ evento.fecha }})</h2>
+    <div class="summary">
+        <p><strong>Total de usuarios registrados:</strong> {{ total_usuarios }}</p>
+        <p><strong>Asistentes:</strong> {{ asistencias.count }}</p>
+        <p><strong>No asistentes:</strong> {{ no_asistentes.count }}</p>
+        <p><strong>Porcentaje de asistencia:</strong> {{ porcentaje_asistencia|floatformat:2 }}%</p>
+    </div>
+    <h3>Asistentes</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>DNI</th>
+                <th>Fecha</th>
+                <th>Ubicación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asistencia in asistencias %}
+            <tr>
+                <td>{{ asistencia.usuario.nombre }}</td>
+                <td>{{ asistencia.usuario.apellido }}</td>
+                <td>{{ asistencia.usuario.dni }}</td>
+                <td>{{ asistencia.fecha|timezone:"America/Lima" }}</td>
+                <td>{{ asistencia.ubicacion.nombre|default:"Sin ubicación" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No hay asistencias registradas para este evento.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>No Asistentes</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>DNI</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in no_asistentes %}
+            <tr>
+                <td>{{ usuario.nombre }}</td>
+                <td>{{ usuario.apellido }}</td>
+                <td>{{ usuario.dni }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Todos los usuarios registrados asistieron.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

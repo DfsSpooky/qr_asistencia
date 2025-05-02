@@ -1,0 +1,54 @@
+{% extends 'asistencia/base.html' %}
+{% block title %}Carnet de {{ usuario.nombre }} {{ usuario.apellido }}{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'lista_usuarios' %}">Lista de Usuarios</a></li>
+<li class="breadcrumb-item active" aria-current="page">Carnet de {{ usuario.nombre }} {{ usuario.apellido }}</li>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4 text-center">Carnet de {{ usuario.nombre }} {{ usuario.apellido }}</h2>
+        <div id="carnet" class="card shadow-lg p-4" style="border: 2px solid #007bff; background: linear-gradient(135deg, #e6f0fa, #ffffff);">
+            <div class="card-body text-center">
+                <h3 class="card-title mb-3" style="color: #007bff;">Carnet de Asistencia</h3>
+                <img src="{{ usuario.foto_perfil.url }}" alt="Foto de {{ usuario.nombre }} {{ usuario.apellido }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                <img src="{{ usuario.qr_code.url }}" alt="Código QR" class="img-fluid mb-3" style="max-width: 150px;">
+                <h5 class="card-subtitle mb-2">{{ usuario.nombre }} {{ usuario.apellido }}</h5>
+                <p class="card-text mb-1"><strong>DNI:</strong> {{ usuario.dni }}</p>
+                <p class="card-text text-muted" style="font-size: 0.9em;">Sistema de Asistencia por QR</p>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <button onclick="printCarnet()" class="btn btn-primary">Imprimir Carnet</button>
+            <a href="{% url 'lista_usuarios' %}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function printCarnet() {
+        const carnet = document.getElementById('carnet').outerHTML;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Carnet de ${'{{ usuario.nombre }} {{ usuario.apellido }}'}</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                    body { margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; }
+                    .card { border: 2px solid #007bff; background: linear-gradient(135deg, #e6f0fa, #ffffff); width: 350px; }
+                    .card-title { color: #007bff; }
+                    .card-text { font-size: 0.9em; }
+                    img { max-width: 150px; }
+                    .rounded-circle { width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff; }
+                </style>
+            </head>
+            <body onload="window.print(); window.close();">
+                ${carnet}
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+</script>
+{% endblock %}
