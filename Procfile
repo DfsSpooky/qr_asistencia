@@ -1,1 +1,1 @@
-web: ./start.sh
+web: gunicorn qr_asistencia.wsgi
