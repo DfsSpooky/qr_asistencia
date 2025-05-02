@@ -3,6 +3,7 @@ Django settings for qr_asistencia project.
 """
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,12 +12,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-5o5$uta6kd!9qc22e=(wx$6^kn-f1yi(n=lothp#h=hxuv+g@g')  # Usará la variable de entorno en Render
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-5o5$uta6kd!9qc22e=(wx$6^kn-f1yi(n=lothp#h=hxuv+g@g')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['23.22.218.164', '127.0.0.1', 'localhost', '.onrender.com']  # Agrega .onrender.com
+ALLOWED_HOSTS = ['23.22.218.164', '127.0.0.1', 'localhost', '.onrender.com']
 
 # Application definition
 INSTALLED_APPS = [
@@ -32,7 +33,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Agrega WhiteNoise para archivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -61,12 +62,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'qr_asistencia.wsgi.application'
 
 # Database
-# Usamos SQLite directamente, almacenándolo en /tmp para Render
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/db.sqlite3',  # Almacena en /tmp para Render
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),  # Fallback para desarrollo local
+        conn_max_age=600
+    )
 }
 
 # Password validation
@@ -87,7 +87,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Usa WhiteNoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -97,7 +97,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configuración de sesiones
 SESSION_COOKIE_AGE = 1800
-SESSION_COOKIE_SECURE = True  # Render usa HTTPS
+SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -122,8 +122,8 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/perfil/'
 
 # Configuraciones de seguridad para producción
-CSRF_COOKIE_SECURE = True  # Render usa HTTPS
-SECURE_SSL_REDIRECT = True  # Redirige a HTTPS
-SECURE_HSTS_SECONDS = 31536000  # HSTS por 1 año
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True

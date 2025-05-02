@@ -9,7 +9,7 @@ else
     exit 1
 fi
 echo "Creando superusuario..."
-python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'tucontraseña') if not User.objects.filter(username='admin').exists() else None"
+python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('miguel', 'admin@example.com', '123456') if not User.objects.filter(username='admin').exists() else None"
 if [ $? -eq 0 ]; then
     echo "Superusuario creado exitosamente"
 else
