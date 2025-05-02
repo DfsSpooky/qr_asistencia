@@ -64,7 +64,6 @@ WSGI_APPLICATION = 'qr_asistencia.wsgi.application'
 # Database
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),  # Fallback para desarrollo local
         conn_max_age=600
     )
 }
