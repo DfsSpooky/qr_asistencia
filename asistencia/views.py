@@ -373,7 +373,7 @@ def create_test_user(request):
     # Crear un Usuario vinculado
     Usuario.objects.create(
         user=user,
-        dni='12345678',  # DNI único, ajusta si es necesario
+        dni='99999999',  # DNI único, ajusta si es necesario
         nombre='Admin',
         apellido='Test'
     )
