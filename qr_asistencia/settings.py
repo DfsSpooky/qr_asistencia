@@ -17,7 +17,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-5o5$uta6kd!9qc22e=(wx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['23.22.218.164', '127.0.0.1', 'localhost', '.onrender.com']
+ALLOWED_HOSTS = ['23.22.218.164', '127.0.0.1', 'localhost', '.onrender.com', '.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [

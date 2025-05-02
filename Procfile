@@ -1,1 +1,1 @@
-web: python manage.py migrate --noinput && python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', '112233') if not User.objects.filter(username='admin').exists() else None" && gunicorn qr_asistencia.wsgi:application --log-file -
+web: ./start.sh
