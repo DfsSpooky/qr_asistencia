@@ -146,7 +146,7 @@ class RegistrarAsistencia(APIView):
             LogAccion.objects.create(
                 usuario=request.user,
                 accion="Registrar asistencia",
-                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {(evento.nombre if evento else 'sin evento')}."
+                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else 'sin evento'}."
             )
 
             return Response({
