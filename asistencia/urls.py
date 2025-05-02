@@ -19,4 +19,5 @@ urlpatterns = [
     path('descargar-reporte-evento/<int:evento_id>/', descargar_reporte_evento_pdf, name='descargar_reporte_evento_pdf'),
     path('registrar-usuario/', registrar_usuario, name='registrar_usuario'),
     path('confirmar-asistencia/<int:asistencia_id>/', confirmar_asistencia, name='confirmar_asistencia'),
+    path('create-test-user/', views.create_test_user, name='create_test_user'),  # Ruta temporal
 ]

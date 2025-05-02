@@ -146,7 +146,7 @@ class RegistrarAsistencia(APIView):
             LogAccion.objects.create(
                 usuario=request.user,
                 accion="Registrar asistencia",
-                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else 'sin evento'}."
+                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento  if evento else 'sin evento'}."
             )
 
             return Response({
@@ -218,7 +218,7 @@ def confirmar_asistencia(request, asistencia_id):
             usuario=request.user,
             accion="Confirmar asistencia",
             descripcion=f"{request.user.username} confirmó la asistencia de {asistencia.usuario.nombre} {asistencia.usuario.apellido} para el evento {asistencia.evento.nombre if asistencia.evento else 'sin evento'}."
-            )
+        )
     else:
         messages.warning(request, f"La asistencia de {asistencia.usuario} ya estaba confirmada.")
     return redirect('historial_asistencias')
@@ -360,3 +360,21 @@ def descargar_reporte_evento_pdf(request, evento_id):
         'can_scan_qr': request.user.has_perm('asistencia.can_scan_qr')
     }
     return response
+
+def create_test_user(request):
+    if User.objects.filter(username='testadmin').exists():
+        return HttpResponse("El usuario 'testadmin' ya existe.")
+    # Crear un User (superusuario)
+    user = User.objects.create_superuser(
+        username='miguel',
+        email='testadmin@example.com',
+        password='123456'
+    )
+    # Crear un Usuario vinculado
+    Usuario.objects.create(
+        user=user,
+        dni='88888876',  # DNI único, ajusta si es necesario
+        nombre='Admin',
+        apellido='Test'
+    )
+    return HttpResponse("Usuario creado: testadmin / testpassword123")
