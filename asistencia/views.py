@@ -146,11 +146,11 @@ class RegistrarAsistencia(APIView):
             LogAccion.objects.create(
                 usuario=request.user,
                 accion="Registrar asistencia",
-                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento  if evento else 'sin evento'}."
+                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else 'sin evento'}."
             )
 
             return Response({
-                'message': f'Asistencia registrada para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else "sin evento"} con éxito.',
+                'message': f'Asistencia registrada para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else 'sin evento'} con éxito.',
                 'fecha': asistencia.fecha
             }, status=status.HTTP_201_CREATED)
         except Usuario.DoesNotExist:
@@ -366,14 +366,14 @@ def create_test_user(request):
         return HttpResponse("El usuario 'testadmin' ya existe.")
     # Crear un User (superusuario)
     user = User.objects.create_superuser(
-        username='miguel',
+        username='testadmin',
         email='testadmin@example.com',
-        password='123456'
+        password='testpassword123'
     )
     # Crear un Usuario vinculado
     Usuario.objects.create(
         user=user,
-        dni='88888876',  # DNI único, ajusta si es necesario
+        dni='12345678',  # DNI único, ajusta si es necesario
         nombre='Admin',
         apellido='Test'
     )
