@@ -150,7 +150,7 @@ class RegistrarAsistencia(APIView):
             )
 
             return Response({
-                'message': f'Asistencia registrada para {usuario.nombre} {usuario.apellido} en el evento {(evento.nombre if evento else 'sin evento')} con éxito.',
+                'message': f'Asistencia registrada para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else 'sin evento'} con éxito.',
                 'fecha': asistencia.fecha
             }, status=status.HTTP_201_CREATED)
         except Usuario.DoesNotExist:
