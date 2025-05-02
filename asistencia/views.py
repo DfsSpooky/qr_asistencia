@@ -366,9 +366,9 @@ def create_test_user(request):
         return HttpResponse("El usuario 'testadmin' ya existe.")
     # Crear un User (superusuario)
     user = User.objects.create_superuser(
-        username='migue',
+        username='testadmin',
         email='testadmin@example.com',
-        password='123456'
+        password='testpassword123'
     )
     # Crear un Usuario vinculado
     Usuario.objects.create(
