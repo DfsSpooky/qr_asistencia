@@ -146,11 +146,11 @@ class RegistrarAsistencia(APIView):
             LogAccion.objects.create(
                 usuario=request.user,
                 accion="Registrar asistencia",
-                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else 'sin evento'}."
+                descripcion=f"{request.user.username} registró asistencia para {usuario.nombre} {usuario.apellido} en el evento {(evento.nombre if evento else 'sin evento')}."
             )
 
             return Response({
-                'message': f'Asistencia registrada para {usuario.nombre} {usuario.apellido} en el evento {evento.nombre if evento else 'sin evento'} con éxito.',
+                'message': f'Asistencia registrada para {usuario.nombre} {usuario.apellido} en el evento {(evento.nombre if evento else 'sin evento')} con éxito.',
                 'fecha': asistencia.fecha
             }, status=status.HTTP_201_CREATED)
         except Usuario.DoesNotExist:
